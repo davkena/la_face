@@ -142,3 +142,6 @@ node_modules/
 # production
 build/
 dist/
+
+# Next.js build output
+.next

@@ -5,8 +5,13 @@
 @tailwind utilities;
 
 body {
-    font-family: 'Inter', sans-serif;
+  font-family: 'Nunito', sans-serif;
+  background: url('/background.png') no-repeat center center/cover;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
 }
+
 
 /* Add text shadow for better readability */
 .text-shadow {
@@ -47,3 +52,4 @@ body {
 .animate-slideUp {
   animation: slideUp 2s ease-in-out forwards;
 }
+
