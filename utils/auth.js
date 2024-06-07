@@ -1,23 +1,55 @@
 // utils/auth.js
-import axiosInstance from './axiosInstance';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 
-export const login = async (username, password) => {
-  const response = await axiosInstance.post('/login/', { username, password });
-  if (response.status === 200) {
-    localStorage.setItem('access_token', response.data.access);
-    localStorage.setItem('refresh_token', response.data.refresh);
-  }
-  return response.data;
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios
+        .get('/api/user', { headers: { Authorization: `Bearer ${token}` } })
+        .then((response) => {
+          setUser(response.data);
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+        });
+    }
+  }, []);
+
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post('/login/', { username, password });
+      localStorage.setItem('token', response.data.access);
+      setUser(response.data.user);
+      // Redirect based on user role
+      if (response.data.user.role === 'super_admin') {
+        router.push('/admin'); // Change this to your desired admin page
+      } else {
+        router.push('/dashboard'); // Change this to your desired user dashboard page
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    router.push('/');
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export const register = async (userData) => {
-  const response = await axiosInstance.post('/register/', userData);
-  return response.data;
-};
-
-export const logout = async () => {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-};
-
-export const getAccessToken = () => localStorage.getItem('access_token');
+export const useAuth = () => useContext(AuthContext);
