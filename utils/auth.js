@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       axios
-        .get('/api/user', { headers: { Authorization: `Bearer ${token}` } })
+        .get('http://127.0.0.1:8000/user/', { headers: { Authorization: `Bearer ${token}` } })
         .then((response) => {
           setUser(response.data);
         })
@@ -25,24 +25,35 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('/login/', { username, password });
+      const response = await axios.post('http://127.0.0.1:8000/login/', { username, password });
+      localStorage.setItem('token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh); // Store refresh token
       localStorage.setItem('token', response.data.access);
       setUser(response.data.user);
       // Redirect based on user role
       if (response.data.user.role === 'super_admin') {
-        router.push('/admin'); // Change this to your desired admin page
+        router.push('/dashboard'); 
       } else {
-        router.push('/dashboard'); // Change this to your desired user dashboard page
+        router.push('/'); 
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    router.push('/');
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token'); // Get refresh token
+      const token = localStorage.getItem('token');
+      await axios.post('http://127.0.0.1:8000/logout/', { refresh: refreshToken }, { headers: { Authorization: `Bearer ${token}` } });
+    } catch (error) {
+      console.error('Logout failed', error);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token'); // Remove refresh token
+      setUser(null);
+      router.push('/');
+    }
   };
 
   return (

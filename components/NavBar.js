@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { useAuth } from "../utils/auth";
+import { useAuth, logout } from "../utils/auth";
 
 const NavBar = () => {
-  const { user } = useAuth();
+  const { user, logout} = useAuth();
   return (
     <nav className="absolute top-0 w-full z-10 flex justify-between items-center p-4 text-shadow animate-slideUp">
       <div className="flex-grow text-center">
@@ -25,6 +25,14 @@ const NavBar = () => {
               Results
             </Link>
           </>
+        )}
+        {user ? (
+          <button onClick={logout} className="hover:underline text-shadow">
+            Logout
+          </button>
+        ) : (
+          <Link href="/login" className="hover:underline">Login
+          </Link>
         )}
       </div>
     </nav>
