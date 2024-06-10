@@ -6,7 +6,9 @@ import { AuthProvider } from '../utils/auth';
 function MyApp({ Component, pageProps }) {
     return (
         <AuthProvider>
-            <Component {...pageProps} />
+            <Layout>
+                <Component {...pageProps} />
+            </Layout>
         </AuthProvider>
     );
 }
