@@ -18,21 +18,20 @@ const NavBar = () => {
         </Link>
         {user && user.role === "super_admin" && (
           <>
-            <Link href="/assessments" className="text-white hover:underline">
+            <Link href="/assessments" className="text-white hover:underline ">
               Tests
             </Link>
-            <Link href="/results" className="text-white hover:underline">
+            <Link href="/results" className="text-white hover:underline ">
               Results
             </Link>
           </>
         )}
         {user ? (
-          <button onClick={logout} className="hover:underline text-shadow">
+          <button onClick={logout} className="text-white hover:underline text-shadow">
             Logout
           </button>
         ) : (
-          <Link href="/login" className="hover:underline">Login
-          </Link>
+          console.log("not logged in")
         )}
       </div>
     </nav>
